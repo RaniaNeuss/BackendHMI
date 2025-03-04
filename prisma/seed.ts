@@ -42,7 +42,7 @@ async function main() {
         "getUsers", "refreshtoken", "editUser", "Register",
         "createUser", "deleteUser", "getGroups", "createGroup",
         "deleteGroup", "getUser", "login", "authStatus",
-        "logout", "editProfile",
+        "logout", "editProfile","manageroles",
 
         // Settings Management
         "createSettings", "getAllSettings", "getSettingsById",

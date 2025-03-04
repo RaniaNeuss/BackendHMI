@@ -743,6 +743,31 @@ export const deleteGroup = async (req: Request, res: Response): Promise<void> =>
     }
 };
 
+export const assignPermissionsToRole = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { roleId, permissions } = req.body;
+
+        if (!roleId || !permissions || !Array.isArray(permissions)) {
+            res.status(400).json({ error: "invalid_request", message: "Invalid input data" });
+            return; // Add return to prevent further execution
+        }
+
+        // Update role permissions
+        await prisma.group.update({
+            where: { id: roleId },
+            data: {
+                permissions: {
+                    set: permissions.map((action: string) => ({ action })) // Explicitly define type
+                }
+            }
+        });
+
+        res.status(200).json({ message: "Permissions updated successfully" });
+    } catch (error) {
+        console.error("Failed to assign permissions:", error);
+        res.status(500).json({ error: "unexpected_error", message: "Failed to update permissions" });
+    }
+};
 
 
 function handleError(res: Response, err: any, context: string): void {

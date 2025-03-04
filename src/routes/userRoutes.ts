@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getUsers,refreshtoken,editUser, Register,createUser, deleteUser, getGroups, createGroup, deleteGroup, getUser, login , authStatus ,logout,editProfile } from '../controllers/userController';
+import { getUsers,refreshtoken,editUser, Register,createUser, deleteUser, getGroups, createGroup, deleteGroup, getUser, login , authStatus ,logout,editProfile ,assignPermissionsToRole } from '../controllers/userController';
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET, REFRESH_SECRET } from "../lib/config";
@@ -35,6 +35,7 @@ const router = Router();
 router.get('/groups', authenticateUser, authorizeRoles("getGroups"), getGroups);
 router.post('/groups', authenticateUser, authorizeRoles("createGroup"), createGroup);
 router.delete('/groups/:id', authenticateUser, authorizeRoles("deleteGroup"), deleteGroup);
+router.post("/assign-permissions", authenticateUser, authorizeRoles("manageroles"), assignPermissionsToRole);
 
 // User routes
 router.get('/', authenticateUser, authorizeRoles("getUsers"), getUsers);
