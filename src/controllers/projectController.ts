@@ -82,11 +82,14 @@ export const getUsersByProjectId = async (req: Request, res: Response): Promise<
             return;
         }
 
-        // Check if the logged-in user has access to the project
         const project = await prisma.project.findUnique({
             where: { id: projectId },
             include: {
-                users: true, // Include users assigned to the project
+                users: {
+                    include: {
+                        groups: true, // Include user groups
+                    },
+                },
             },
         });
 
