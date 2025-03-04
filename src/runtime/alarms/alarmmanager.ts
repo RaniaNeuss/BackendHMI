@@ -130,7 +130,7 @@ class Alarm {
       this.acktime = Date.now();
       this.lastcheck = 0;
       this.userack = username;
-      console.log(`[Ack] Alarm ${this.name} acknowledged by ${username}.`);
+      // console.log(`[Ack] Alarm ${this.name} acknowledged by ${username}.`);
     }
   }
 
@@ -173,7 +173,7 @@ class Alarm {
       finalValue !== undefined &&
       finalValue >= minVal &&
       finalValue <= maxVal;
-      console.log(`[DEBUG]  ${this.name} inRange=${inRange}, status=${this.status}, ontime=${this.ontime}, now=${currentTime}`);
+      // console.log(`[DEBUG]  ${this.name} inRange=${inRange}, status=${this.status}, ontime=${this.ontime}, now=${currentTime}`);
 
     switch (this.status) {
       case AlarmStatusEnum.VOID:
@@ -280,7 +280,7 @@ class AlarmsManager {
    * Start the manager’s interval
    */
   start(): void {
-    console.log("🚀 Alarm Manager Started.");
+    // console.log("🚀 Alarm Manager Started.");
     setInterval(() => this.checkStatus(), ALARMS_CHECK_INTERVAL_MS);
   }
 
@@ -298,13 +298,13 @@ class AlarmsManager {
     try {
       switch (this.status) {
         case AlarmsStatusEnum.INIT:
-          console.log("⏳ State: INIT => load DB => status=LOAD");
+          // console.log("⏳ State: INIT => load DB => status=LOAD");
           await this.initDB();         // optional init, e.g. migrations, etc.
           this.status = AlarmsStatusEnum.LOAD;
           break;
 
         case AlarmsStatusEnum.LOAD:
-          console.log("⏳ State: LOAD => load properties & alarms => status=IDLE");
+          // console.log("⏳ State: LOAD => load properties & alarms => status=IDLE");
           // Clear or load alarms
           if (this.clearAlarmsFlag) {
             await this.clearAlarms(); // or partial clear
@@ -317,7 +317,7 @@ class AlarmsManager {
           break;
 
         case AlarmsStatusEnum.IDLE:
-          console.log("🔍 State: IDLE => process alarms");
+          // console.log("🔍 State: IDLE => process alarms");
           const changed = await this.processAlarms();
           if (changed) {
             this.emitAlarmsChanged(true);
@@ -336,7 +336,7 @@ class AlarmsManager {
    * Optional DB init
    */
   private async initDB(): Promise<void> {
-    console.log("📡 (Optional) DB init or migrations done here.");
+    // console.log("📡 (Optional) DB init or migrations done here.");
   }
 
   /**
@@ -349,7 +349,7 @@ class AlarmsManager {
     // If you store them in the same table, you just skip this step. Or if you want a separate approach:
     //   e.g. SELECT * FROM AlarmDefinitions => for each definition, create or update the alarm in DB
     // For now, we won't do anything. You can adapt as needed.
-    console.log("📡 loadAlarmDefinitions => (stub) retrieve alarm property from config or DB...");
+    // console.log("📡 loadAlarmDefinitions => (stub) retrieve alarm property from config or DB...");
     // TODO: Implementation depends on your app’s schema. 
   }
 
@@ -358,12 +358,12 @@ class AlarmsManager {
    * (similar to `_loadAlarms()` in the 1st code).
    */
   private async loadPersistedAlarms(): Promise<void> {
-    console.log("📡 Loading alarms from DB...");
+    // console.log("📡 Loading alarms from DB...");
     // Example: load all alarm rows with the Tag included
     const alarmsFromDB = await this.prisma.alarm.findMany({
       include: { tag: true },
     });
-    console.log(`✅ Loaded ${alarmsFromDB.length} alarms from DB.`);
+    // console.log(`✅ Loaded ${alarmsFromDB.length} alarms from DB.`);
 
     this.alarms = {};
 
@@ -523,7 +523,7 @@ class AlarmsManager {
   // }
   
   async processAlarms(): Promise<boolean> {
-    console.log("🔄 Checking alarms...");
+    // console.log("🔄 Checking alarms...");
     let anyChange = false;
     const currentTime = Date.now();
   
@@ -624,7 +624,7 @@ class AlarmsManager {
       case ActionsTypes.SET_VALUE:
         // TODO: Implement setValue logic
         // e.g. find the target tag and update DB
-        console.log(`[Action] SET_VALUE param=${alarm.subproperty.actparam}`);
+        // console.log(`[Action] SET_VALUE param=${alarm.subproperty.actparam}`);
         break;
 
       case ActionsTypes.RUN_SCRIPT:
@@ -637,7 +637,7 @@ class AlarmsManager {
       case ActionsTypes.SET_VIEW:
       case ActionsTypes.SEND_MSG:
         // UI-level or messaging-level actions
-        console.log(`[Action] ${alarm.subproperty.type} params=${alarm.subproperty.actparam}`);
+        // console.log(`[Action] ${alarm.subproperty.type} params=${alarm.subproperty.actparam}`);
         break;
     }
   }
@@ -655,7 +655,7 @@ class AlarmsManager {
   async clearAlarms(all: boolean = true): Promise<void> {
     // If "all" is true => remove all rows
     // If partial => adapt logic
-    console.log("[ClearAlarms] Clearing all alarms from DB...");
+    // console.log("[ClearAlarms] Clearing all alarms from DB...");
     await this.prisma.alarm.deleteMany({});
     // Also empty local
     this.alarms = {};
@@ -674,7 +674,7 @@ class AlarmsManager {
   async checkRetention(retentionLimitDate: Date): Promise<void> {
     // e.g. delete old alarm history older than retentionLimitDate
     // If you separate alarm "history" from "active" table, do that here
-    console.log(`[Retention] Deleting older than ${retentionLimitDate}`);
+    // console.log(`[Retention] Deleting older than ${retentionLimitDate}`);
     // TODO: Implement with your schema: 
     // await this.prisma.alarmHistory.deleteMany({
     //   where: { ontime: { lt: retentionLimitDate } }
@@ -720,7 +720,7 @@ class AlarmsManager {
    */
   getAlarmsValues() {
     const activeAlarms: any[] = [];
-    console.log (`[Alarms] activeAlarms=${activeAlarms.length}`);
+    // console.log (`[Alarms] activeAlarms=${activeAlarms.length}`);
 
     for (const nameKey in this.alarms) {
       for (const alarm of this.alarms[nameKey]) {
@@ -775,7 +775,7 @@ async setAlarmAck(alarmId:string, username:string): Promise<boolean> {
    */
   async getAlarmsHistory(start: Date, end: Date) {
     // Example if you have an alarmHistory table
-    console.log(`[History] fetching from ${start} to ${end}`);
+    // console.log(`[History] fetching from ${start} to ${end}`);
     // TODO: adapt to your schema:
     // return this.prisma.alarmHistory.findMany({
     //   where: {

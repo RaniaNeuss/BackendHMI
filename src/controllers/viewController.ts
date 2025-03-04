@@ -9,7 +9,7 @@ export const createView = async (req: Request, res: Response): Promise<void> => 
            
         const { projectId } = req.params;
         const { name, width, height, backgroundColor,gridType,property,description} = req.body;
-    //     const userId = req.userId;
+        const userId = req.userId;
     //       if (!userId) {
     //        res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
     //        return;

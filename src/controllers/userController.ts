@@ -362,10 +362,10 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
          const userId = req.userId;       
           console.log('userId:', userId);
 
-        if (!userId) {
-            res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-            return;
-        }
+        // if (!userId) {
+        //     res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+        //     return;
+        // }
 
         const users = await prisma.user.findMany({
             include: { groups: true },
@@ -388,10 +388,10 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
         const userId = req.userId;    
         console.log('userId:', userId);
 
-       if (!userId) {
-           res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-           return;
-       }
+    //    if (!userId) {
+    //        res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+    //        return;
+    //    }
 
         const user = await prisma.user.findUnique({ where: { id: String(userId) } });
          console.info("Fetched all users successfully");
@@ -414,19 +414,23 @@ export const editProfile = async (req: Request, res: Response): Promise<void> =>
         const userId = req.userId;   
             console.log('userId:', userId);
 
-       if (!userId) {
-           res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-           return;
-       }        const {email, name, info,username,password ,group} = req.body; // Retrieve the fields to update from the request body
+    //    if (!userId) {
+    //        res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+    //        return;
+    //    }   
+       
+       
+       
+       const {email, name, info,username,password ,group} = req.body; // Retrieve the fields to update from the request body
 
         // Validate `id`
-        if (!userId) {
-            res.status(400).json({
-                error: "validation_error",
-                message: "User ID is required.",
-            });
-            return;
-        }
+        // if (!userId) {
+        //     res.status(400).json({
+        //         error: "validation_error",
+        //         message: "User ID is required.",
+        //     });
+        //     return;
+        // }
 
         // Check if the user exists
         const user = await prisma.user.findUnique({
@@ -522,10 +526,10 @@ export const editUser = async (req: Request, res: Response): Promise<void> => {
         const { email, name, info, username, password, group } = req.body;
 
         // 1️⃣ **Check if user is authenticated**
-        if (!userId) {
-            res.status(401).json({ error: "unauthorized", message: "User is not logged in" });
-            return;
-        }
+        // if (!userId) {
+        //     res.status(401).json({ error: "unauthorized", message: "User is not logged in" });
+        //     return;
+        // }
 
         // 2️⃣ **Ensure user ID is provided**
         if (!id) {
@@ -664,10 +668,10 @@ export const getGroups = async (req: Request, res: Response): Promise<void> => {
        // Retrieve userId from session
         const userId = req.userId;       console.log('userId:', userId);
 
-       if (!userId) {
-           res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-           return;
-       }
+    //    if (!userId) {
+    //        res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+    //        return;
+    //    }
 
         const groups = await prisma.group.findMany();
          console.info("Fetched all groups successfully");
@@ -687,10 +691,10 @@ export const createGroup = async (req: Request, res: Response): Promise<void> =>
        // Retrieve userId from session
         const userId = req.userId;       console.log('userId:', userId);
 
-       if (!userId) {
-           res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-           return;
-       }
+    //    if (!userId) {
+    //        res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+    //        return;
+    //    }
 
         const { name } = req.body;
 
@@ -725,10 +729,10 @@ export const deleteGroup = async (req: Request, res: Response): Promise<void> =>
        // Retrieve userId from session
         const userId = req.userId;       console.log('userId:', userId);
 
-       if (!userId) {
-           res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-           return;
-       }
+    //    if (!userId) {
+    //        res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+    //        return;
+    //    }
 
         await prisma.group.delete({ where: { id: String(userId) } });
         console.info(`Group deleted successfully: ${userId}`);

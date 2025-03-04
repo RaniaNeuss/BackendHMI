@@ -32,22 +32,23 @@ interface User {
   }
 const router = Router();
 // Role routes
-router.get('/groups',authenticateUser,authorizeRoles(['SuperAdmin']), getGroups);
-router.post('/groups',authenticateUser,authorizeRoles(['SuperAdmin']), createGroup);
-router.delete('/groups/:id',authenticateUser,authorizeRoles(['SuperAdmin']), deleteGroup);
+router.get('/groups', authenticateUser, authorizeRoles("getGroups"), getGroups);
+router.post('/groups', authenticateUser, authorizeRoles("createGroup"), createGroup);
+router.delete('/groups/:id', authenticateUser, authorizeRoles("deleteGroup"), deleteGroup);
 
 // User routes
-router.get('/',authenticateUser, authorizeRoles(['SuperAdmin']),getUsers);
+router.get('/', authenticateUser, authorizeRoles("getUsers"), getUsers);
 
 router.post('/',
-  authenticateUser,authorizeRoles(['SuperAdmin']), 
+  authenticateUser, authorizeRoles("createUser"), 
   createUser
 );
 router.post('/register', Register);
-router.delete('/:id',authenticateUser,authorizeRoles(['SuperAdmin']), deleteUser);
-router.get('/:id',authenticateUser, getUser);
-router.put('/',authenticateUser, editProfile);
-router.put('/:id',authenticateUser, editUser);
+router.delete('/:id', authenticateUser, authorizeRoles("deleteUser"), deleteUser);
+router.get('/:id', authenticateUser, authorizeRoles("getUser"), getUser);
+router.put('/', authenticateUser, authorizeRoles("editProfile"), editProfile);
+router.put('/:id', authenticateUser, authorizeRoles("editUser"), editUser);
+
 
 
 

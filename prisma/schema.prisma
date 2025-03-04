@@ -44,7 +44,7 @@ model User {
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
   projects  Project[]       @relation("ProjectToUser")
-  groups    Group[]   @relation("UserGroups")
+  groups    Group[]   @relation("UserGroups")  //roles
   alarms    Alarm[]         @relation("AlarmAcknowledgements") // Fixed relation to Alarm model
   alarmHistories AlarmHistory[]   @relation("AlarmHistoryAcknowledgements")
 }
@@ -229,16 +229,18 @@ model DeviceSecurity {
 
 
 
-
 model Group {
-  id       String  @id @default(uuid())
-  name     String    @unique
-  users    User[]    @relation("UserGroups")
-
+  id          String        @id @default(uuid())
+  name        String        @unique
+  users       User[]        @relation("UserGroups")
+  permissions Permission[]  @relation("GroupPermissions")
 }
 
-
-
+model Permission {
+  id        String   @id @default(uuid())
+  action    String   @unique
+  groups    Group[]  @relation("GroupPermissions")
+}
 
 model Notification {
   id            String   @id @default(uuid())

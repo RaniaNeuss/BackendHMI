@@ -4,7 +4,7 @@ import {
   getAllProjects,
   getProjectById,
   updateProjectData,
-  assignUsersToProject,       // New: Edit assigned users
+  assignUsersToProject,       
   removeAssignedUsers,
   deleteProject,getUsersByProjectId,inviteUsers,getUnassignedUsers
  
@@ -14,33 +14,36 @@ import { authorizeRoles } from '../lib/authorizeRoles';
 
 const router = Router();
 
+
 // Fetch all projects
-router.get('/getprojects',authenticateUser, getAllProjects); // GET /api/projects
+router.get("/getprojects", authenticateUser, authorizeRoles("getAllProjects"), getAllProjects);
 
 // Fetch a project by ID
-router.get('/:id',authenticateUser, getProjectById); // GET /api/projects/:id
-// Edit (Replace) Assigned Users in a Project
+router.get("/:id", authenticateUser, authorizeRoles("getProjectById"), getProjectById);
 
-// Remove Specific Users from a Project
-router.delete('/:projectId/removeusers',authenticateUser,authorizeRoles(['SuperAdmin']), removeAssignedUsers);
+// Remove specific users from a project
+router.delete("/:projectId/removeusers", authenticateUser, authorizeRoles("removeAssignedUsers"), removeAssignedUsers);
 
 // Create a new project
-router.post('/create',authenticateUser,authorizeRoles(['SuperAdmin']), createProject); // POST /api/projects
+router.post("/create", authenticateUser, authorizeRoles("createProject"), createProject);
 
 // Update specific project data
-router.put('/:id',authenticateUser, updateProjectData); // POST /api/projects/data
+router.put("/:id", authenticateUser, authorizeRoles("updateProjectData"), updateProjectData);
 
-router.get('/:projectId/users',authenticateUser,authorizeRoles(['SuperAdmin']), getUsersByProjectId);
+// Get users assigned to a project
+router.get("/:projectId/users", authenticateUser, authorizeRoles("getUsersByProjectId"), getUsersByProjectId);
 
-router.post('/:projectId/assignusers',authenticateUser,authorizeRoles(['SuperAdmin']), assignUsersToProject);
-router.get('/:projectId/unassignedusers',authenticateUser,authorizeRoles(['SuperAdmin']), getUnassignedUsers);
-router.post('/:projectId/inviteusers',authenticateUser,authorizeRoles(['SuperAdmin']), inviteUsers);
+// Assign users to a project
+router.post("/:projectId/assignusers", authenticateUser, authorizeRoles("assignUsersToProject"), assignUsersToProject);
+
+// Get unassigned users for a project
+router.get("/:projectId/unassignedusers", authenticateUser, authorizeRoles("getUnassignedUsers"), getUnassignedUsers);
+
+// Invite users to a project
+router.post("/:projectId/inviteusers", authenticateUser, authorizeRoles("inviteUsers"), inviteUsers);
 
 // Delete a project by ID
-router.delete('/:id',authenticateUser,authorizeRoles(['SuperAdmin']), deleteProject); // DELETE /api/projects/:id
-
-
-
+router.delete("/:id", authenticateUser, authorizeRoles("deleteProject"), deleteProject);
 
 
 

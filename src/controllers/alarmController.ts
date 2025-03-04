@@ -24,10 +24,10 @@ export const setAlarmDefinition = async (req: Request, res: Response): Promise<v
     const userId = req.userId;   
     
 
-   if (!userId) {
-       res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-       return;
-   }
+  //  if (!userId) {
+  //      res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+  //      return;
+  //  }
     const { projectId } = req.params;
     if (!projectId) {
     res.status(400).json({
@@ -192,10 +192,10 @@ export const editAlarmdef= async (req: Request, res: Response): Promise<void> =>
     const userId = req.userId;   
     
 
-   if (!userId) {
-       res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-       return;
-   }
+  //  if (!userId) {
+  //      res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+  //      return;
+  //  }
     const { alarmDefId } = req.params;
     if (!alarmDefId) {
       res.status(400).json({
@@ -289,10 +289,10 @@ export const deleteAlarmDefinition = async (req: Request, res: Response): Promis
   try {
     // 1) Ensure user is logged in
     const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ error: "unauthorized", message: "User is not logged in" });
-      return;
-    }
+    // if (!userId) {
+    //   res.status(401).json({ error: "unauthorized", message: "User is not logged in" });
+    //   return;
+    // }
 
     // 2) Get the alarmDefId from URL params
     const { alarmDefId } = req.params;
@@ -346,12 +346,10 @@ export const getAllAlarmDefinitions = async (
   try {
     // 1) Ensure user is logged in
     const userId = req.userId;
-    if (!userId) {
-      res
-        .status(401)
-        .json({ error: "unauthorized", message: "User is not logged in" });
-      return;
-    }
+     //  if (!userId) {
+  //      res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+  //      return;
+  //  }
 
     // 2) Fetch all alarm definitions
     //    Optionally include related fields (e.g. 'tag', 'project')
@@ -381,10 +379,10 @@ export const setAlarmAck = async (req: Request, res: Response): Promise<void> =>
  const userId = req.userId;   
          
 
- if (!userId) {
-     res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-     return;
- }
+//  if (!userId) {
+//      res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+//      return;
+//  }
     // 1) Validate presence
     if (!alarmId) {
       res.status(400).json({

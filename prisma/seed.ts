@@ -20,15 +20,78 @@ async function main() {
         update: {}, // If the user exists, don't modify it
         create: {
             username: 'admin',
-            email: 'admin@example.com',
-            password: await bcrypt.hash('password123', 10), // Hash the password
+            email: 'admin@main.com',
+            password: await bcrypt.hash('password123456', 10), // Hash the password
             groups: {
                 connect: { id: superAdminGroup.id }, // Link to SuperAdmin group
             },
         },
     });
     console.log(`SuperAdmin user '${superAdminUser.username}' ensured.`);
+
+    const permissions = [
+        // Project Management
+        "createProject", "getAllProjects", "getProjectById", "updateProjectData",
+        "assignUsersToProject", "removeAssignedUsers", "deleteProject",
+        "getUsersByProjectId", "inviteUsers", "getUnassignedUsers",
+
+        // View Management
+        "createView", "getAllViews", "getViewById", "updateView", "deleteView",
+
+        // User Management
+        "getUsers", "refreshtoken", "editUser", "Register",
+        "createUser", "deleteUser", "getGroups", "createGroup",
+        "deleteGroup", "getUser", "login", "authStatus",
+        "logout", "editProfile",
+
+        // Settings Management
+        "createSettings", "getAllSettings", "getSettingsById",
+        "updateSettings", "deleteSettings",
+
+        // Device Management
+        "createDevice", "editDevice", "deleteDevice",
+        "getDeviceById", "getAllDevices", "setTankLevel",
+        "testWebAPIConnection", "deleteManyDevices", "deleteAllDevices",
+
+        // Alarm Management
+        "getAllAlarms", "clearOneAlarm", "clearAllAlarms",
+        "deleteAllAlarmHistories", "editAlarmdef", "setAlarmDefinition",
+        "deleteAlarmDefinition", "getAllAlarmDefinitions"
+    ];
+
+    // Upsert permissions to avoid duplication
+    for (const action of permissions) {
+        await prisma.permission.upsert({
+            where: { action },
+            update: {},
+            create: { action },
+        });
+    }
+    console.log("Permissions seeded successfully!");
+
+    // 4️⃣ **Assign All Permissions to SuperAdmin**
+    const allPermissions = await prisma.permission.findMany();
+    await prisma.group.update({
+        where: { id: superAdminGroup.id },
+        data: {
+            permissions: {
+                connect: allPermissions.map((perm) => ({ id: perm.id })),
+            },
+        },
+    });
+
+    console.log(`All permissions assigned to '${superAdminGroup.name}'.`);
+
+
+
+
+
+
+
 }
+
+
+
 
 main()
     .then(() => {

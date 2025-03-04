@@ -7,33 +7,32 @@ import { getAllAlarms,clearOneAlarm,clearAllAlarms,deleteAllAlarmHistories,editA
 import { authenticateUser } from "../lib/authMiddleware";
 import { authorizeRoles } from '../lib/authorizeRoles';
 const router = Router();
+//****** Alarm Definition Routes ************//
+router.post('/setalarmdef/:projectId', authenticateUser, authorizeRoles("setAlarmDefinition"), setAlarmDefinition);
+router.put("/definitions/:alarmDefId", authenticateUser, authorizeRoles("editAlarmdef"), editAlarmdef);
+router.delete("/definitions/:alarmDefId", authenticateUser, authorizeRoles("deleteAlarmDefinition"), deleteAlarmDefinition);
+router.get("/definitions", authenticateUser, authorizeRoles("getAllAlarmDefinitions"), getAllAlarmDefinitions);
 
-//****** Alarm defention routes ************//
+//********** Active Alarm Routes ********************//
 
-router.post('/setalarmdef/:projectId',authenticateUser,authorizeRoles(['SuperAdmin']),  setAlarmDefinition);
-router.put("/definitions/:alarmDefId",authenticateUser,authorizeRoles(['SuperAdmin']), editAlarmdef);
-router.delete("/definitions/:alarmDefId",authenticateUser,authorizeRoles(['SuperAdmin']), deleteAlarmDefinition);
-router.get("/definitions",authenticateUser,authorizeRoles(['SuperAdmin']), getAllAlarmDefinitions);
+// Acknowledge alarm
+router.post('/:alarmId/acknowledge', authenticateUser, authorizeRoles("setAlarmAck"), setAlarmAck);
 
+// Get alarm history
+router.get('/history', authenticateUser, authorizeRoles("getAlarmHistory"), getAlarmHistory);
 
+// Delete all alarm history
+router.delete("/history", authenticateUser, authorizeRoles("deleteAllAlarmHistories"), deleteAllAlarmHistories);
 
-//********** Active Alarm  routes ********************//
+// Clear a specific alarm
+router.delete("/:alarmId", authenticateUser, authorizeRoles("clearOneAlarm"), clearOneAlarm);
 
-//aknowledge alarm
-router.post('/:alarmId/acknowledge',authenticateUser, authorizeRoles(['Operator', 'SuperAdmin']), setAlarmAck);
-//get alarm history
-router.get('/history',authenticateUser,authorizeRoles(['SuperAdmin']), getAlarmHistory);
-//delete all alarm history
-router.delete("/history",authenticateUser,authorizeRoles(['SuperAdmin']), deleteAllAlarmHistories);
+// Clear all alarms
+router.delete("/", authenticateUser, authorizeRoles("clearAllAlarms"), clearAllAlarms);
 
+// Fetch all active alarms
+router.get('/', authenticateUser, authorizeRoles("getAllAlarms"), getAllAlarms);
 
-
-
-
-
-
-router.delete("/:alarmId", clearOneAlarm);
-router.delete("/", clearAllAlarms);
-router.get('/',authenticateUser,authorizeRoles(['SuperAdmin']), getAllAlarms);
-router.put("/:alarmId",authenticateUser,authorizeRoles(['SuperAdmin']), editAlarm);
+// Edit an alarm
+router.put("/:alarmId", authenticateUser, authorizeRoles("editAlarm"), editAlarm);
 export default router;

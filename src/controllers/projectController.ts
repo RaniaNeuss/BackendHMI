@@ -13,12 +13,10 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
     try {
         const userId = req.userId;
 
-
         if (!userId) {
-            res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+            res.status(401).json({ error: 'unauthorized', message: 'User is not logged in.' });
             return;
         }
-
         const { name, description } = req.body;
 
         if (!name) {
@@ -53,7 +51,7 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
 
         res.status(201).json({ message: 'Project created successfully', project: newProject });
     } catch (err: any) {
-        console.error('Error creating project:', err.message);
+        console.error(`Failed to create projects for userId ${req.userId}: ${err.message}`);
         res.status(500).json({ error: 'unexpected_error', message: 'An error occurred while creating the project' });
     }
 };
@@ -69,10 +67,10 @@ export const getUsersByProjectId = async (req: Request, res: Response): Promise<
         const userId = req.userId; // Logged-in user
         console.log('userId:', userId);
 
-        if (!userId) {
-            res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-            return;
-        }
+        // if (!userId) {
+        //     res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+        //     return;
+        // }
 
         const { projectId } = req.params;
 
@@ -125,10 +123,10 @@ export const getAllProjects = async (req: Request, res: Response): Promise<void>
     try {
         const userId = req.userId;
 
-        if (!userId) {
-            res.status(401).json({ error: 'unauthorized', message: 'User is not logged in.' });
-            return;
-        }
+        // if (!userId) {
+        //     res.status(401).json({ error: 'unauthorized', message: 'User is not logged in.' });
+        //     return;
+        // }
 
         // Fetch projects owned by the user or where the user is assigned
         const projects = await prisma.project.findMany({
@@ -328,10 +326,10 @@ export const assignUsersToProject = async (req: Request, res: Response): Promise
         const userId = req.userId; // Logged-in user
         console.log('userId:', userId);
 
-        if (!userId) {
-            res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-            return;
-        }
+        // if (!userId) {
+        //     res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+        //     return;
+        // }
 
         const { projectId } = req.params;
         const { userIds } = req.body;
@@ -434,10 +432,10 @@ export const removeAssignedUsers = async (req: Request, res: Response): Promise<
         const { projectId } = req.params;
         const { userIds } = req.body; // List of users to remove
 
-        if (!userId) {
-            res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
-            return;
-        }
+        // if (!userId) {
+        //     res.status(401).json({ error: 'unauthorized', message: 'User is not logged in' });
+        //     return;
+        // }
 
         if (!projectId) {
             res.status(400).json({ error: 'validation_error', message: 'Project ID is required.' });
@@ -561,10 +559,10 @@ export const getUnassignedUsers = async (req: Request, res: Response): Promise<v
 export const inviteUsers = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.userId;
-        if (!userId) {
-            res.status(401).json({ error: 'unauthorized', message: 'Admin is not logged in' });
-            return;
-        }
+        // if (!userId) {
+        //     res.status(401).json({ error: 'unauthorized', message: 'Admin is not logged in' });
+        //     return;
+        // }
 
         const { projectId } = req.params;
         const { emails } = req.body;
@@ -720,27 +718,52 @@ export const inviteUsers = async (req: Request, res: Response): Promise<void> =>
 
 
 // Function to send an invitation email
-const sendInvitationEmail = async (email: string,projectId: string) => {
+
+
+const sendInvitationEmail = async (email: string, projectId: string) => {
     try {
+        // Fetch project settings
+        const settings = await prisma.settings.findUnique({
+            where: { projectId },
+        });
+
+        if (!settings || !settings.form) {
+            console.error(`No SMTP configuration found for project: ${projectId}`);
+            return;
+        }
+
+        // Parse the settings JSON
+        const config = JSON.parse(settings.form);
+        const smtpConfig = config.stepTwo; // Extract SMTP settings
+
+        if (!smtpConfig || !smtpConfig.host || !smtpConfig.mailSender || !smtpConfig.password) {
+            console.error("Incomplete SMTP configuration.");
+            return;
+        }
+
+        // Create transporter with user-supplied credentials
         const transporter = nodemailer.createTransport({
             service: "Gmail",
             auth: {
-                user: process.env.EMAIL_USER, // Your email
-                pass: process.env.EMAIL_PASS, // Your email password
+                user: smtpConfig.mailSender,
+                pass: smtpConfig.password,
             },
         });
+
+       
+
 
         const registrationLink = `http://your-app.com/register?email=${encodeURIComponent(email)}&projectId=${projectId}`;
 
         await transporter.sendMail({
-            from: '" Neuss Admin" <admin@your-app.com>',
+            from: `"Project Admin" <${smtpConfig.mailSender}>`,
             to: email,
             subject: "Neuss Project Invitation!",
-            text: `Hello,\n\nYou have been invited to join our system. Click the link below to register:\n${registrationLink}\n\nBest regards,\n Neuss Team`,
-            html: `<p>Hello,</p><p>You have been invited to join our system. Click the link below to register:</p><a href="${registrationLink}">Register Here</a><p>Best regards,<br> Neuss Team</p>`,
+            text: `Hello,\n\nYou have been invited to join our system. Click the link below to register:\n${registrationLink}\n\nBest regards,\nNeuss Team`,
+            html: `<p>Hello,</p><p>You have been invited to join our system. Click the link below to register:</p><a href="${registrationLink}">Register Here</a><p>Best regards,<br>Neuss Team</p>`,
         });
 
-        console.info(`Invitation email sent to ${email}`);
+        console.info(`Invitation email sent to ${email} using ${smtpConfig.mailSender}`);
     } catch (error) {
         console.error(`Failed to send invitation email to ${email}:`, error);
     }
